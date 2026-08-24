@@ -5,6 +5,7 @@ import { Lead } from "../models/Lead.js";
 import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { buildLeadScopeFilter, canAccessLead, canAssignTo } from "../services/leadScope.js";
+import { logActivity } from "../services/activityService.js";
 
 const LEAD_SOURCES = ["Website", "Referral", "Cold Call", "Social Media", "Other"] as const;
 const LEAD_STATUSES = ["New", "Contacted", "Qualified", "Proposal", "Won", "Lost"] as const;
@@ -77,7 +78,12 @@ export const createLead = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const lead = await Lead.create({ ...body, assignedTo });
-  // TODO(Task 5): log activity here (type: "created")
+  await logActivity({
+    lead: lead.id,
+    user: req.user!.id,
+    type: "created",
+    message: `${lead.name} created`,
+  });
   res.status(201).json({ lead });
 });
 
@@ -115,9 +121,20 @@ export const updateLead = asyncHandler(async (req: Request, res: Response) => {
   await lead.save();
 
   if (body.status && body.status !== previousStatus) {
-    // TODO(Task 5): log activity here (type: "status_changed", meta: { from: previousStatus, to: body.status })
+    await logActivity({
+      lead: lead.id,
+      user: req.user!.id,
+      type: "status_changed",
+      message: `moved to ${body.status}`,
+      meta: { from: previousStatus, to: body.status },
+    });
   } else {
-    // TODO(Task 5): log activity here (type: "updated")
+    await logActivity({
+      lead: lead.id,
+      user: req.user!.id,
+      type: "updated",
+      message: `${lead.name} updated`,
+    });
   }
 
   res.json({ lead });
@@ -138,7 +155,13 @@ export const reassignLead = asyncHandler(async (req: Request, res: Response) => 
 
   lead.assignedTo = new Types.ObjectId(body.assignedTo);
   await lead.save();
-  // TODO(Task 5): log activity here (type: "assigned")
+  await logActivity({
+    lead: lead.id,
+    user: req.user!.id,
+    type: "assigned",
+    message: `reassigned`,
+    meta: { assignedTo: body.assignedTo },
+  });
   res.json({ lead });
 });
 
@@ -147,7 +170,12 @@ export const deleteLead = asyncHandler(async (req: Request, res: Response) => {
   if (!lead) {
     throw new AppError("Lead not found", 404, "NOT_FOUND");
   }
+  await logActivity({
+    lead: lead.id,
+    user: req.user!.id,
+    type: "deleted",
+    message: `${lead.name} deleted`,
+  });
   await lead.deleteOne();
-  // TODO(Task 5): log activity here (type: "deleted")
   res.status(204).send();
 });
