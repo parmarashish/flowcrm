@@ -9,6 +9,10 @@ import { buildLeadScopeFilter, canAccessLead, canAssignTo } from "../services/le
 const LEAD_SOURCES = ["Website", "Referral", "Cold Call", "Social Media", "Other"] as const;
 const LEAD_STATUSES = ["New", "Contacted", "Qualified", "Proposal", "Won", "Lost"] as const;
 
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 const listQuerySchema = z.object({
   status: z.enum(LEAD_STATUSES).optional(),
   source: z.enum(LEAD_SOURCES).optional(),
@@ -33,9 +37,10 @@ export const listLeads = asyncHandler(async (req: Request, res: Response) => {
     filter.createdAt = createdAt;
   }
   if (query.search) {
+    const escapedSearch = escapeRegex(query.search);
     filter.$or = [
-      { name: { $regex: query.search, $options: "i" } },
-      { email: { $regex: query.search, $options: "i" } },
+      { name: { $regex: escapedSearch, $options: "i" } },
+      { email: { $regex: escapedSearch, $options: "i" } },
     ];
   }
 

@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { User } from "../models/User.js";
 import type { ILead } from "../models/Lead.js";
 import type { UserRole } from "../models/User.js";
@@ -43,7 +44,11 @@ export async function canAccessLead(requester: Requester, lead: ILead): Promise<
 
 export async function canAssignTo(requester: Requester, targetUserId: string): Promise<boolean> {
   if (requester.role === "admin") {
-    return true;
+    if (!Types.ObjectId.isValid(targetUserId)) {
+      return false;
+    }
+    const exists = await User.exists({ _id: targetUserId });
+    return exists !== null;
   }
   if (requester.role === "team_leader") {
     if (targetUserId === requester.id) {
