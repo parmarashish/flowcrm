@@ -3,6 +3,7 @@ import cors from "cors";
 import { env } from "./config/env.js";
 import { connectDB, isDbConnected } from "./config/db.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 
@@ -12,6 +13,8 @@ app.use(express.json());
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", db: isDbConnected() ? "connected" : "disconnected" });
 });
+
+app.use("/api/auth", authRoutes);
 
 app.use(errorHandler);
 
