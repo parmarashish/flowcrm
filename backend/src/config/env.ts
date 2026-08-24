@@ -1,22 +1,30 @@
 import "dotenv/config";
+import { z } from "zod";
 
-function required(name: string, fallback?: string): string {
-  const value = process.env[name] ?? fallback;
-  if (value === undefined) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
+const envSchema = z.object({
+  PORT: z.coerce.number().int().positive().default(5000),
+  MONGODB_URI: z.string().default(""),
+  JWT_SECRET: z.string().min(1).optional(),
+  JWT_EXPIRES_IN: z.string().default("7d"),
+  CORS_ORIGIN: z.string().default("http://localhost:3000"),
+  NODE_ENV: z.string().optional(),
+});
+
+const parsed = envSchema.safeParse(process.env);
+if (!parsed.success) {
+  throw new Error(`Invalid environment variables: ${parsed.error.message}`);
 }
 
-const jwtSecretFromEnv = process.env.JWT_SECRET;
-if (!jwtSecretFromEnv && process.env.NODE_ENV === "production") {
+const raw = parsed.data;
+
+if (!raw.JWT_SECRET && raw.NODE_ENV === "production") {
   throw new Error("JWT_SECRET must be set in production");
 }
 
 export const env = {
-  PORT: Number(process.env.PORT ?? 5000),
-  MONGODB_URI: required("MONGODB_URI", ""),
-  JWT_SECRET: jwtSecretFromEnv ?? "dev-secret-change-me",
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN ?? "7d",
-  CORS_ORIGIN: process.env.CORS_ORIGIN ?? "http://localhost:3000",
+  PORT: raw.PORT,
+  MONGODB_URI: raw.MONGODB_URI,
+  JWT_SECRET: raw.JWT_SECRET ?? "dev-secret-change-me",
+  JWT_EXPIRES_IN: raw.JWT_EXPIRES_IN,
+  CORS_ORIGIN: raw.CORS_ORIGIN,
 };
