@@ -6,6 +6,8 @@ import { signToken } from "../utils/jwt.js";
 import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
+const DUMMY_PASSWORD_HASH = "$2a$10$CwTycUXWue0Thq9StjUM0uJ8kX2qwoevGnu.OJALiK9/f7EGY3S1e";
+
 const registerSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
@@ -54,12 +56,10 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   const body = loginSchema.parse(req.body);
 
   const user = await User.findOne({ email: body.email });
-  if (!user) {
-    throw new AppError("Invalid email or password", 401, "INVALID_CREDENTIALS");
-  }
+  const passwordHashToCompare = user ? user.passwordHash : DUMMY_PASSWORD_HASH;
 
-  const valid = await bcrypt.compare(body.password, user.passwordHash);
-  if (!valid) {
+  const valid = await bcrypt.compare(body.password, passwordHashToCompare);
+  if (!user || !valid) {
     throw new AppError("Invalid email or password", 401, "INVALID_CREDENTIALS");
   }
 
