@@ -32,6 +32,10 @@ const updateUserSchema = z
 export const updateUser = asyncHandler(async (req: Request, res: Response) => {
   const body = updateUserSchema.parse(req.body);
 
+  if (!Types.ObjectId.isValid(req.params.id)) {
+    throw new AppError("Invalid user id", 400, "VALIDATION_ERROR");
+  }
+
   const user = await User.findById(req.params.id);
   if (!user) {
     throw new AppError("User not found", 404, "NOT_FOUND");
