@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLoginMutation } from "@/features/auth/authApi";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials, persistAuth } from "@/features/auth/authSlice";
+import { apiSlice } from "@/store/apiSlice";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -23,6 +24,7 @@ export default function LoginPage() {
     try {
       const result = await login({ email, password }).unwrap();
       dispatch(setCredentials(result));
+      dispatch(apiSlice.util.resetApiState());
       persistAuth(result.token, result.user);
       router.push("/dashboard");
     } catch {

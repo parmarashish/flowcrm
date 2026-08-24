@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRegisterMutation } from "@/features/auth/authApi";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials, persistAuth } from "@/features/auth/authSlice";
+import { apiSlice } from "@/store/apiSlice";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -24,6 +25,7 @@ export default function RegisterPage() {
     try {
       const result = await register({ name, email, password }).unwrap();
       dispatch(setCredentials(result));
+      dispatch(apiSlice.util.resetApiState());
       persistAuth(result.token, result.user);
       router.push("/dashboard");
     } catch (err) {
