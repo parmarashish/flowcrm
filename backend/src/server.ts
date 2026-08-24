@@ -14,9 +14,16 @@ app.get("/health", (_req, res) => {
 
 async function start() {
   await connectDB();
-  app.listen(env.PORT, () => {
+  const httpServer = app.listen(env.PORT, () => {
     console.log(`[server] listening on http://localhost:${env.PORT}`);
+  });
+  httpServer.on("error", (err) => {
+    console.error("[server] listen error:", err);
+    process.exit(1);
   });
 }
 
-start();
+start().catch((err) => {
+  console.error("[server] failed to start:", err);
+  process.exit(1);
+});
