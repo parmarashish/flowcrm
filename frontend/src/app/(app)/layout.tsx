@@ -3,21 +3,23 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/store/hooks";
-import { selectToken } from "@/features/auth/authSlice";
+import { selectToken, selectHasHydrated } from "@/features/auth/authSlice";
 import { Sidebar } from "@/components/Sidebar";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const token = useAppSelector(selectToken);
+  const hasHydrated = useAppSelector(selectHasHydrated);
   const router = useRouter();
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
+    if (!hasHydrated) return;
     if (token === null) {
       router.replace("/login");
     } else {
       setChecked(true);
     }
-  }, [token, router]);
+  }, [token, hasHydrated, router]);
 
   if (!checked) {
     return null;

@@ -13,11 +13,13 @@ export interface PublicUser {
 interface AuthState {
   token: string | null;
   user: PublicUser | null;
+  hasHydrated: boolean;
 }
 
 const initialState: AuthState = {
   token: null,
   user: null,
+  hasHydrated: false,
 };
 
 const authSlice = createSlice({
@@ -27,6 +29,10 @@ const authSlice = createSlice({
     setCredentials(state, action: PayloadAction<{ token: string; user: PublicUser }>) {
       state.token = action.payload.token;
       state.user = action.payload.user;
+      state.hasHydrated = true;
+    },
+    markHydrated(state) {
+      state.hasHydrated = true;
     },
     logout(state) {
       state.token = null;
@@ -35,7 +41,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, markHydrated, logout } = authSlice.actions;
 export default authSlice.reducer;
 
 export function selectCurrentUser(state: { auth: AuthState }): PublicUser | null {
@@ -44,6 +50,10 @@ export function selectCurrentUser(state: { auth: AuthState }): PublicUser | null
 
 export function selectToken(state: { auth: AuthState }): string | null {
   return state.auth.token;
+}
+
+export function selectHasHydrated(state: { auth: AuthState }): boolean {
+  return state.auth.hasHydrated;
 }
 
 const AUTH_STORAGE_KEY = "mini_crm_auth";

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAppDispatch } from "@/store/hooks";
-import { setCredentials, readPersistedAuth } from "@/features/auth/authSlice";
+import { setCredentials, markHydrated, readPersistedAuth } from "@/features/auth/authSlice";
 
 export function AuthInitializer() {
   const dispatch = useAppDispatch();
@@ -11,6 +11,8 @@ export function AuthInitializer() {
     const persisted = readPersistedAuth();
     if (persisted) {
       dispatch(setCredentials(persisted));
+    } else {
+      dispatch(markHydrated());
     }
   }, [dispatch]);
 
