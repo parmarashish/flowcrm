@@ -66,6 +66,7 @@ export default function LeadDetailPage() {
     <div className="max-w-lg">
       <h1 className="mb-4 text-2xl font-bold">Edit Lead</h1>
       <LeadForm
+        key={id}
         initialValues={data.lead}
         onSubmit={handleSubmit}
         submitLabel="Save Changes"
