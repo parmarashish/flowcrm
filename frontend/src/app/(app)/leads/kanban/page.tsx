@@ -8,7 +8,7 @@ import { KanbanColumn } from "@/components/kanban/KanbanColumn";
 const STATUSES: LeadStatus[] = ["New", "Contacted", "Qualified", "Proposal", "Won", "Lost"];
 
 export default function KanbanPage() {
-  const { data, isLoading } = useGetLeadsQuery({ limit: 100 });
+  const { data, isLoading, isError } = useGetLeadsQuery({ limit: 100 });
   const [updateLead] = useUpdateLeadMutation();
 
   async function handleDragEnd(event: DragEndEvent) {
@@ -27,6 +27,7 @@ export default function KanbanPage() {
     }
   }
 
+  if (isError) return <p>Failed to load leads.</p>;
   if (isLoading) return <p>Loading...</p>;
 
   return (

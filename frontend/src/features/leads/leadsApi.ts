@@ -65,13 +65,14 @@ export const leadsApi = apiSlice.injectEndpoints({
     }),
     createLead: builder.mutation<{ lead: Lead }, CreateLeadBody>({
       query: (body) => ({ url: "/leads", method: "POST", body }),
-      invalidatesTags: [{ type: "Lead", id: "LIST" }],
+      invalidatesTags: [{ type: "Lead", id: "LIST" }, { type: "Activity", id: "LIST" }],
     }),
     updateLead: builder.mutation<{ lead: Lead }, { id: string; body: UpdateLeadBody }>({
       query: ({ id, body }) => ({ url: `/leads/${id}`, method: "PATCH", body }),
       invalidatesTags: (_result, _error, { id }) => [
         { type: "Lead", id },
         { type: "Lead", id: "LIST" },
+        { type: "Activity", id: "LIST" },
       ],
     }),
     reassignLead: builder.mutation<{ lead: Lead }, { id: string; assignedTo: string }>({
@@ -83,11 +84,12 @@ export const leadsApi = apiSlice.injectEndpoints({
       invalidatesTags: (_result, _error, { id }) => [
         { type: "Lead", id },
         { type: "Lead", id: "LIST" },
+        { type: "Activity", id: "LIST" },
       ],
     }),
     deleteLead: builder.mutation<void, string>({
       query: (id) => ({ url: `/leads/${id}`, method: "DELETE" }),
-      invalidatesTags: [{ type: "Lead", id: "LIST" }],
+      invalidatesTags: [{ type: "Lead", id: "LIST" }, { type: "Activity", id: "LIST" }],
     }),
   }),
 });

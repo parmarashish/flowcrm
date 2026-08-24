@@ -34,7 +34,7 @@ export default function LeadsPage() {
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
 
-  const { data, isLoading, isFetching } = useGetLeadsQuery({
+  const { data, isLoading, isFetching, isError } = useGetLeadsQuery({
     search: search || undefined,
     status: status === "all" ? undefined : status,
     source: source === "all" ? undefined : source,
@@ -129,6 +129,8 @@ export default function LeadsPage() {
             <Skeleton key={i} className="h-10 w-full" />
           ))}
         </div>
+      ) : isError ? (
+        <p className="text-sm text-destructive">Failed to load leads.</p>
       ) : (
         <Table>
           <TableHeader>

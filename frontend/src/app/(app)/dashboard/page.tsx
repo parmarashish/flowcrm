@@ -21,10 +21,22 @@ import {
 } from "@/features/dashboard/dashboardApi";
 
 export default function DashboardPage() {
-  const { data: summaryData, isLoading: summaryLoading } = useGetSummaryQuery();
-  const { data: bySourceData, isLoading: bySourceLoading } = useGetBySourceQuery();
-  const { data: trendData, isLoading: trendLoading } = useGetTrendQuery();
-  const { data: activityData, isLoading: activityLoading } = useGetActivityQuery();
+  const {
+    data: summaryData,
+    isLoading: summaryLoading,
+    isError: summaryError,
+  } = useGetSummaryQuery();
+  const {
+    data: bySourceData,
+    isLoading: bySourceLoading,
+    isError: bySourceError,
+  } = useGetBySourceQuery();
+  const { data: trendData, isLoading: trendLoading, isError: trendError } = useGetTrendQuery();
+  const {
+    data: activityData,
+    isLoading: activityLoading,
+    isError: activityError,
+  } = useGetActivityQuery();
 
   return (
     <div className="flex flex-col gap-6">
@@ -33,6 +45,8 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {summaryLoading ? (
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)
+        ) : summaryError ? (
+          <p className="text-sm text-destructive">Failed to load.</p>
         ) : (
           <>
             <StatCard label="Total Leads" value={summaryData?.summary.total ?? 0} />
@@ -51,6 +65,8 @@ export default function DashboardPage() {
           <h2 className="mb-2 text-lg font-semibold">Leads by Source</h2>
           {bySourceLoading ? (
             <Skeleton className="h-64 w-full" />
+          ) : bySourceError ? (
+            <p className="text-sm text-destructive">Failed to load.</p>
           ) : (
             <ResponsiveContainer width="100%" height={256}>
               <BarChart data={bySourceData?.items ?? []}>
@@ -68,6 +84,8 @@ export default function DashboardPage() {
           <h2 className="mb-2 text-lg font-semibold">Monthly Trend</h2>
           {trendLoading ? (
             <Skeleton className="h-64 w-full" />
+          ) : trendError ? (
+            <p className="text-sm text-destructive">Failed to load.</p>
           ) : (
             <ResponsiveContainer width="100%" height={256}>
               <LineChart data={trendData?.items ?? []}>
@@ -86,6 +104,8 @@ export default function DashboardPage() {
         <h2 className="mb-2 text-lg font-semibold">Recent Activity</h2>
         {activityLoading ? (
           <Skeleton className="h-40 w-full" />
+        ) : activityError ? (
+          <p className="text-sm text-destructive">Failed to load.</p>
         ) : (
           <ul className="flex flex-col gap-2">
             {activityData?.items.map((item) => (

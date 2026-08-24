@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectCurrentUser, logout, clearPersistedAuth } from "@/features/auth/authSlice";
+import { apiSlice } from "@/store/apiSlice";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -21,6 +22,7 @@ export function Sidebar() {
 
   function handleLogout() {
     dispatch(logout());
+    dispatch(apiSlice.util.resetApiState());
     clearPersistedAuth();
     router.push("/login");
   }

@@ -19,7 +19,7 @@ export default function LeadDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const currentUser = useAppSelector(selectCurrentUser);
-  const { data, isLoading } = useGetLeadQuery(id);
+  const { data, isLoading, isError } = useGetLeadQuery(id);
   const [updateLead, { isLoading: isUpdating }] = useUpdateLeadMutation();
   const [reassignLead] = useReassignLeadMutation();
   const [deleteLead] = useDeleteLeadMutation();
@@ -60,6 +60,7 @@ export default function LeadDetailPage() {
   }
 
   if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Failed to load lead.</p>;
   if (!data) return <p>Lead not found.</p>;
 
   return (

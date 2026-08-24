@@ -31,12 +31,15 @@ export const dashboardApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getSummary: builder.query<{ summary: DashboardSummary }, void>({
       query: () => "/dashboard/summary",
+      providesTags: [{ type: "Lead", id: "LIST" }],
     }),
     getBySource: builder.query<{ items: BySourceItem[] }, void>({
       query: () => "/dashboard/by-source",
+      providesTags: [{ type: "Lead", id: "LIST" }],
     }),
     getTrend: builder.query<{ items: TrendItem[] }, void>({
       query: () => "/dashboard/trend",
+      providesTags: [{ type: "Lead", id: "LIST" }],
     }),
     getActivity: builder.query<{ items: ActivityItem[] }, void>({
       query: () => "/dashboard/activity",

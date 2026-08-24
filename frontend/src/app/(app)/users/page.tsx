@@ -27,7 +27,9 @@ const ROLES: UserRole[] = ["admin", "team_leader", "agent"];
 export default function UsersPage() {
   const currentUser = useAppSelector(selectCurrentUser);
   const router = useRouter();
-  const { data, isLoading } = useGetUsersQuery(undefined, { skip: currentUser?.role !== "admin" });
+  const { data, isLoading, isError } = useGetUsersQuery(undefined, {
+    skip: currentUser?.role !== "admin",
+  });
   const [updateUserRole] = useUpdateUserRoleMutation();
 
   useEffect(() => {
@@ -39,6 +41,8 @@ export default function UsersPage() {
   if (!currentUser || currentUser.role !== "admin") {
     return null;
   }
+
+  if (isError) return <p>Failed to load users.</p>;
 
   const teamLeaders = data?.users.filter((u) => u.role === "team_leader") ?? [];
 
@@ -73,6 +77,7 @@ export default function UsersPage() {
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Team Lead</TableHead>
+              <TableHead>ID</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -84,6 +89,7 @@ export default function UsersPage() {
                   <Select
                     value={user.role}
                     onValueChange={(v) => handleRoleChange(user.id, v as UserRole)}
+                    disabled={user.id === currentUser?.id}
                   >
                     <SelectTrigger className="w-36">
                       <SelectValue />
@@ -115,6 +121,7 @@ export default function UsersPage() {
                     </SelectContent>
                   </Select>
                 </TableCell>
+                <TableCell className="font-mono text-xs">{user.id}</TableCell>
               </TableRow>
             ))}
           </TableBody>
