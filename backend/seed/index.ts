@@ -86,6 +86,7 @@ async function main() {
       Activity.create({
         lead: lead._id,
         user: owner._id,
+        assignedTo: owner._id,
         type: "created",
         message: `${lead.name} created`,
         createdAt: lead.createdAt,
