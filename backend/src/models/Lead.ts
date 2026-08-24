@@ -36,4 +36,6 @@ const leadSchema = new Schema<ILead>(
   { timestamps: true }
 );
 
+leadSchema.index({ assignedTo: 1, createdAt: -1 });
+
 export const Lead = model<ILead>("Lead", leadSchema);

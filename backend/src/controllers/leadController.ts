@@ -14,6 +14,21 @@ function escapeRegex(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function toPublicLead(lead: InstanceType<typeof Lead>) {
+  return {
+    id: lead.id as string,
+    name: lead.name,
+    email: lead.email,
+    phone: lead.phone,
+    source: lead.source,
+    status: lead.status,
+    assignedTo: lead.assignedTo.toString(),
+    notes: lead.notes,
+    createdAt: lead.createdAt,
+    updatedAt: lead.updatedAt,
+  };
+}
+
 const listQuerySchema = z.object({
   status: z.enum(LEAD_STATUSES).optional(),
   source: z.enum(LEAD_SOURCES).optional(),
@@ -53,7 +68,7 @@ export const listLeads = asyncHandler(async (req: Request, res: Response) => {
     Lead.countDocuments(filter),
   ]);
 
-  res.json({ items, total, page: query.page, limit: query.limit });
+  res.json({ items: items.map(toPublicLead), total, page: query.page, limit: query.limit });
 });
 
 const createLeadSchema = z.object({
@@ -81,10 +96,11 @@ export const createLead = asyncHandler(async (req: Request, res: Response) => {
   await logActivity({
     lead: lead.id,
     user: req.user!.id,
+    assignedTo: lead.assignedTo.toString(),
     type: "created",
     message: `${lead.name} created`,
   });
-  res.status(201).json({ lead });
+  res.status(201).json({ lead: toPublicLead(lead) });
 });
 
 async function findAccessibleLead(req: Request) {
@@ -100,7 +116,7 @@ async function findAccessibleLead(req: Request) {
 
 export const getLead = asyncHandler(async (req: Request, res: Response) => {
   const lead = await findAccessibleLead(req);
-  res.json({ lead });
+  res.json({ lead: toPublicLead(lead) });
 });
 
 const updateLeadSchema = z.object({
@@ -124,6 +140,7 @@ export const updateLead = asyncHandler(async (req: Request, res: Response) => {
     await logActivity({
       lead: lead.id,
       user: req.user!.id,
+      assignedTo: lead.assignedTo.toString(),
       type: "status_changed",
       message: `moved to ${body.status}`,
       meta: { from: previousStatus, to: body.status },
@@ -132,12 +149,13 @@ export const updateLead = asyncHandler(async (req: Request, res: Response) => {
     await logActivity({
       lead: lead.id,
       user: req.user!.id,
+      assignedTo: lead.assignedTo.toString(),
       type: "updated",
       message: `${lead.name} updated`,
     });
   }
 
-  res.json({ lead });
+  res.json({ lead: toPublicLead(lead) });
 });
 
 const reassignSchema = z.object({
@@ -158,11 +176,12 @@ export const reassignLead = asyncHandler(async (req: Request, res: Response) => 
   await logActivity({
     lead: lead.id,
     user: req.user!.id,
+    assignedTo: lead.assignedTo.toString(),
     type: "assigned",
     message: `reassigned`,
     meta: { assignedTo: body.assignedTo },
   });
-  res.json({ lead });
+  res.json({ lead: toPublicLead(lead) });
 });
 
 export const deleteLead = asyncHandler(async (req: Request, res: Response) => {
@@ -173,6 +192,7 @@ export const deleteLead = asyncHandler(async (req: Request, res: Response) => {
   await logActivity({
     lead: lead.id,
     user: req.user!.id,
+    assignedTo: lead.assignedTo.toString(),
     type: "deleted",
     message: `${lead.name} deleted`,
   });

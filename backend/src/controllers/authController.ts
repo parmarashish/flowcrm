@@ -31,8 +31,9 @@ function toPublicUser(user: IUser) {
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const body = registerSchema.parse(req.body);
+  const email = body.email.toLowerCase().trim();
 
-  const existing = await User.findOne({ email: body.email });
+  const existing = await User.findOne({ email });
   if (existing) {
     throw new AppError("Email already registered", 409, "EMAIL_TAKEN");
   }
@@ -43,7 +44,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
   const user = await User.create({
     name: body.name,
-    email: body.email,
+    email,
     passwordHash,
     role,
   });
@@ -54,8 +55,9 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const body = loginSchema.parse(req.body);
+  const email = body.email.toLowerCase().trim();
 
-  const user = await User.findOne({ email: body.email });
+  const user = await User.findOne({ email });
   const passwordHashToCompare = user ? user.passwordHash : DUMMY_PASSWORD_HASH;
 
   const valid = await bcrypt.compare(body.password, passwordHashToCompare);

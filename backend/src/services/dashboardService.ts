@@ -68,8 +68,7 @@ export async function getTrend(requester: Requester) {
 
 export async function getRecentActivity(requester: Requester, limit = 20) {
   const scopeFilter = await buildLeadScopeFilter(requester);
-  const leadIds = await Lead.find(scopeFilter).distinct("_id");
-  const activities = await Activity.find({ lead: { $in: leadIds } })
+  const activities = await Activity.find(scopeFilter)
     .sort({ createdAt: -1 })
     .limit(limit)
     .populate("user", "name")

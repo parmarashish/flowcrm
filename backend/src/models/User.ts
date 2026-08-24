@@ -33,4 +33,6 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
+userSchema.index({ teamLead: 1 });
+
 export const User = model<IUser>("User", userSchema);

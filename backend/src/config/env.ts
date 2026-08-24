@@ -17,8 +17,11 @@ if (!parsed.success) {
 
 const raw = parsed.data;
 
-if (!raw.JWT_SECRET && raw.NODE_ENV === "production") {
-  throw new Error("JWT_SECRET must be set in production");
+const isExplicitlyNonProd = raw.NODE_ENV === "development" || raw.NODE_ENV === "test";
+if (!raw.JWT_SECRET && !isExplicitlyNonProd) {
+  throw new Error(
+    "JWT_SECRET must be set (only omit it when NODE_ENV is 'development' or 'test')"
+  );
 }
 
 export const env = {

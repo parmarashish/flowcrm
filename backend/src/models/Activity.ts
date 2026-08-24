@@ -5,6 +5,7 @@ export type ActivityType = "created" | "status_changed" | "assigned" | "updated"
 export interface IActivity extends Document {
   lead: Types.ObjectId;
   user: Types.ObjectId;
+  assignedTo: Types.ObjectId;
   type: ActivityType;
   message: string;
   meta?: Record<string, unknown>;
@@ -15,6 +16,7 @@ const activitySchema = new Schema<IActivity>(
   {
     lead: { type: Schema.Types.ObjectId, ref: "Lead", required: true },
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    assignedTo: { type: Schema.Types.ObjectId, ref: "User", required: true },
     type: {
       type: String,
       enum: ["created", "status_changed", "assigned", "updated", "deleted"],

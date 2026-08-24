@@ -1,22 +1,32 @@
 import type { NextFunction, Request, Response } from "express";
 import { AppError } from "../utils/AppError.js";
 import { verifyToken } from "../utils/jwt.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { User } from "../models/User.js";
 import type { UserRole } from "../models/User.js";
 
-export function authMiddleware(req: Request, _res: Response, next: NextFunction) {
+export const authMiddleware = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
   const header = req.headers.authorization;
   if (!header || !header.startsWith("Bearer ")) {
     throw new AppError("Missing or invalid Authorization header", 401, "UNAUTHORIZED");
   }
   const token = header.slice("Bearer ".length);
+
+  let payload;
   try {
-    const payload = verifyToken(token);
-    req.user = { id: payload.sub, role: payload.role };
-    next();
+    payload = verifyToken(token);
   } catch {
     throw new AppError("Invalid or expired token", 401, "UNAUTHORIZED");
   }
-}
+
+  const user = await User.findById(payload.sub).select("role");
+  if (!user) {
+    throw new AppError("Invalid or expired token", 401, "UNAUTHORIZED");
+  }
+
+  req.user = { id: payload.sub, role: user.role };
+  next();
+});
 
 export function requireRole(...roles: UserRole[]) {
   return (req: Request, _res: Response, next: NextFunction) => {
