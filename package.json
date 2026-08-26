@@ -1,9 +1,10 @@
 {
-  "name": "mini-crm",
+  "name": "flowcrm",
   "private": true,
   "workspaces": ["backend", "frontend"],
   "scripts": {
-    "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\""
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "seed": "npm run seed --workspace=backend"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

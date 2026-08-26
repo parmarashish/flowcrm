@@ -1,11 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import {
+  ArrowLeft,
+  Trash2,
+  UserCheck,
+  ShieldAlert,
+  Info,
+  Calendar,
+  Layers,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { LeadForm, type LeadFormValues } from "@/components/LeadForm";
+import { StatusBadge } from "@/components/StatusBadge";
 import {
   useGetLeadQuery,
   useUpdateLeadMutation,
@@ -21,8 +33,8 @@ export default function LeadDetailPage() {
   const currentUser = useAppSelector(selectCurrentUser);
   const { data, isLoading, isError } = useGetLeadQuery(id);
   const [updateLead, { isLoading: isUpdating }] = useUpdateLeadMutation();
-  const [reassignLead] = useReassignLeadMutation();
-  const [deleteLead] = useDeleteLeadMutation();
+  const [reassignLead, { isLoading: isReassigning }] = useReassignLeadMutation();
+  const [deleteLead, { isLoading: isDeleting }] = useDeleteLeadMutation();
   const [reassignTo, setReassignTo] = useState("");
 
   const canReassign = currentUser?.role === "admin" || currentUser?.role === "team_leader";
@@ -31,7 +43,7 @@ export default function LeadDetailPage() {
   async function handleSubmit(values: LeadFormValues) {
     try {
       await updateLead({ id, body: values }).unwrap();
-      toast.success("Lead updated");
+      toast.success("Lead details updated");
     } catch {
       toast.error("Failed to update lead");
     }
@@ -41,15 +53,16 @@ export default function LeadDetailPage() {
     if (!reassignTo.trim()) return;
     try {
       await reassignLead({ id, assignedTo: reassignTo.trim() }).unwrap();
-      toast.success("Lead reassigned");
+      toast.success("Lead successfully reassigned");
       setReassignTo("");
     } catch {
-      toast.error("Failed to reassign lead — check the user id is valid and within your team");
+      toast.error("Failed to reassign lead — ensure valid user ID within team");
     }
   }
 
   async function handleDelete() {
-    if (!confirm("Delete this lead? This cannot be undone.")) return;
+    if (!confirm("Are you sure you want to delete this lead? This action is irreversible."))
+      return;
     try {
       await deleteLead(id).unwrap();
       toast.success("Lead deleted");
@@ -59,40 +72,161 @@ export default function LeadDetailPage() {
     }
   }
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Failed to load lead.</p>;
-  if (!data) return <p>Lead not found.</p>;
+  const formatTimestamp = (dateStr?: string) => {
+    if (!dateStr) return "—";
+    try {
+      return new Date(dateStr).toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+
+  if (isError || !data?.lead) {
+    return (
+      <div className="mx-auto max-w-2xl rounded-[2px] border border-[#d13212] bg-[#fdf3f2] p-4 text-xs text-[#d13212]">
+        <p className="font-semibold">Lead Not Found</p>
+        <p className="mt-1">The requested lead could not be loaded or may have been deleted.</p>
+        <Link href="/leads" className="mt-3 inline-block font-medium text-[#0066cc] underline">
+          Return to Leads
+        </Link>
+      </div>
+    );
+  }
+
+  const lead = data.lead;
 
   return (
-    <div className="max-w-lg">
-      <h1 className="mb-4 text-2xl font-bold">Edit Lead</h1>
-      <LeadForm
-        key={id}
-        initialValues={data.lead}
-        onSubmit={handleSubmit}
-        submitLabel="Save Changes"
-        isSubmitting={isUpdating}
-      />
-
-      {canReassign && (
-        <div className="mt-6 flex flex-col gap-2 border-t pt-4">
-          <label className="text-sm font-medium">Reassign to (user id)</label>
-          <div className="flex gap-2">
-            <Input
-              value={reassignTo}
-              onChange={(e) => setReassignTo(e.target.value)}
-              placeholder="Target user id"
-            />
-            <Button onClick={handleReassign}>Reassign</Button>
+    <div className="mx-auto max-w-3xl flex flex-col gap-4">
+      {/* Header Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#d5d9d9] pb-3">
+        <div className="flex items-center gap-2">
+          <Link href="/leads">
+            <Button variant="outline" size="sm" className="h-7 px-2">
+              <ArrowLeft className="size-3.5 mr-1" /> Leads
+            </Button>
+          </Link>
+          <div className="border-l border-[#d5d9d9] pl-2">
+            <div className="flex items-center gap-2">
+              <h1 className="text-base font-semibold text-[#0f1923]">{lead.name}</h1>
+              <StatusBadge status={lead.status} />
+            </div>
+            <p className="text-[11px] text-[#545b64] font-mono">Lead ID: {lead.id}</p>
           </div>
         </div>
-      )}
 
-      {canDelete && (
-        <div className="mt-6 border-t pt-4">
-          <Button variant="destructive" onClick={handleDelete}>
+        {canDelete && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="gap-1.5"
+          >
+            <Trash2 className="size-3.5" />
             Delete Lead
           </Button>
+        )}
+      </div>
+
+      {/* Metadata Overview Panel */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 rounded-[2px] border border-[#d5d9d9] bg-white p-3 text-xs">
+        <div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-[#879596] block">
+            Acquisition Source
+          </span>
+          <span className="font-medium text-[#0f1923] mt-0.5 block">{lead.source}</span>
+        </div>
+        <div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-[#879596] block">
+            Assigned User ID
+          </span>
+          <span className="font-mono text-[11px] text-[#0f1923] mt-0.5 block truncate">
+            {lead.assignedTo || "Unassigned"}
+          </span>
+        </div>
+        <div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-[#879596] block">
+            Created Date
+          </span>
+          <span className="text-[#0f1923] mt-0.5 block text-[11px]">
+            {formatTimestamp(lead.createdAt)}
+          </span>
+        </div>
+        <div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-[#879596] block">
+            Last Updated
+          </span>
+          <span className="text-[#0f1923] mt-0.5 block text-[11px]">
+            {formatTimestamp(lead.updatedAt)}
+          </span>
+        </div>
+      </div>
+
+      {/* Main Edit Form Panel */}
+      <div className="rounded-[2px] border border-[#d5d9d9] bg-white">
+        <div className="border-b border-[#d5d9d9] px-4 py-2.5 bg-[#f8f9fa]">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-[#0f1923]">
+            Edit Lead Properties
+          </h2>
+        </div>
+        <div className="p-4">
+          <LeadForm
+            key={lead.id}
+            initialValues={lead}
+            onSubmit={handleSubmit}
+            submitLabel="Save Changes"
+            isSubmitting={isUpdating}
+            cancelHref="/leads"
+          />
+        </div>
+      </div>
+
+      {/* Reassignment Panel (Admin / Team Leader) */}
+      {canReassign && (
+        <div className="rounded-[2px] border border-[#d5d9d9] bg-white">
+          <div className="border-b border-[#d5d9d9] px-4 py-2.5 bg-[#f8f9fa] flex items-center justify-between">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-[#0f1923]">
+              Reassign Lead Ownership
+            </h2>
+            <span className="text-[11px] text-[#879596]">Privileged Action</span>
+          </div>
+          <div className="p-4 flex flex-col gap-2">
+            <label className="text-xs font-semibold text-[#545b64]">
+              Target Agent / User ID
+            </label>
+            <div className="flex gap-2 max-w-md">
+              <Input
+                value={reassignTo}
+                onChange={(e) => setReassignTo(e.target.value)}
+                placeholder="Enter User UUID / MongoDB ID"
+                className="h-8 text-xs"
+              />
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleReassign}
+                disabled={isReassigning || !reassignTo.trim()}
+              >
+                <UserCheck className="size-3.5 mr-1.5" />
+                {isReassigning ? "Reassigning..." : "Reassign"}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>

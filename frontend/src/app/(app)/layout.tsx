@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/store/hooks";
 import { selectToken, selectHasHydrated } from "@/features/auth/authSlice";
 import { Sidebar } from "@/components/Sidebar";
+import { Header } from "@/components/Header";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const token = useAppSelector(selectToken);
@@ -26,9 +27,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex">
+    <div className="flex h-screen w-full overflow-hidden bg-[#f1f3f4]">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto p-6">{children}</main>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <Header />
+        <main className="flex-1 overflow-y-auto bg-[#f1f3f4] p-4 text-[#0f1923]">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

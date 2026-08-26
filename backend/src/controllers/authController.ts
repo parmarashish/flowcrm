@@ -64,6 +64,12 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   if (!user || !valid) {
     throw new AppError("Invalid email or password", 401, "INVALID_CREDENTIALS");
   }
+  if (user.status === "inactive") {
+    throw new AppError("This account has been deactivated", 403, "ACCOUNT_DEACTIVATED");
+  }
+
+  user.lastLogin = new Date();
+  await user.save();
 
   const token = signToken({ sub: user.id, role: user.role });
   res.json({ token, user: toPublicUser(user) });

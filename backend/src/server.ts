@@ -10,6 +10,12 @@ import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import leadRoutes from "./routes/leadRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
+import companyRoutes from "./routes/companyRoutes.js";
+import dealRoutes from "./routes/dealRoutes.js";
+import taskRoutes from "./routes/taskRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
+import activityRoutes from "./routes/activityRoutes.js";
 
 const app = express();
 
@@ -24,6 +30,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/leads", leadRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/contacts", contactRoutes);
+app.use("/api/companies", companyRoutes);
+app.use("/api/deals", dealRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/reports", reportRoutes);
+app.use("/api/activity", activityRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapiSpec));
 
 app.use((_req, _res, next) => {

@@ -67,8 +67,13 @@ export async function getTrend(requester: Requester) {
 }
 
 export async function getRecentActivity(requester: Requester, limit = 20) {
-  const scopeFilter = await buildLeadScopeFilter(requester);
-  const activities = await Activity.find(scopeFilter)
+  // Activity now spans all 6 modules, not just leads, so scoping by the
+  // lead-specific `assignedTo` filter would silently drop every non-lead
+  // entry for non-admins (those rows never set `assignedTo`). Scope by
+  // `user` (who performed the action) instead, matching the same
+  // self-scoping rule the /api/activity list endpoint already uses.
+  const filter = requester.role === "admin" ? {} : { user: requester.id };
+  const activities = await Activity.find(filter)
     .sort({ createdAt: -1 })
     .limit(limit)
     .populate("user", "name")

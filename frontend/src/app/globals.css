@@ -1,48 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --radius: 0.5rem;
-}
+  /* AWS Console Light Theme Color Tokens */
+  --background: #f1f3f4;
+  --foreground: #0f1923;
+  --card: #ffffff;
+  --card-foreground: #0f1923;
+  --popover: #ffffff;
+  --popover-foreground: #0f1923;
+  --primary: #0066cc;
+  --primary-foreground: #ffffff;
+  --secondary: #e9ebed;
+  --secondary-foreground: #0f1923;
+  --muted: #eaeded;
+  --muted-foreground: #545b64;
+  --accent: #f2f3f3;
+  --accent-foreground: #0f1923;
+  --destructive: #d13212;
+  --destructive-foreground: #ffffff;
+  --border: #d5d9d9;
+  --input: #aab7b8;
+  --ring: #0066cc;
+  --radius: 2px;
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  /* Custom AWS Tokens */
+  --aws-sidebar-bg: #0f1923;
+  --aws-sidebar-text: #d1d5db;
+  --aws-sidebar-active: #1a6fba;
+  --aws-sidebar-hover: rgba(255, 255, 255, 0.08);
+  --aws-content-bg: #f1f3f4;
+  --aws-card-border: #d5d9d9;
+  --aws-primary: #0066cc;
+  --aws-primary-hover: #0052a3;
+  --aws-success: #1d8102;
+  --aws-warning: #e07b00;
+  --aws-danger: #d13212;
+  --aws-text-primary: #0f1923;
+  --aws-text-secondary: #545b64;
+  --aws-text-muted: #879596;
 }
 
 @theme inline {
@@ -65,13 +60,73 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-aws-sidebar: var(--aws-sidebar-bg);
+  --color-aws-sidebar-text: var(--aws-sidebar-text);
+  --color-aws-sidebar-active: var(--aws-sidebar-active);
+  --color-aws-content: var(--aws-content-bg);
+  --color-aws-success: var(--aws-success);
+  --color-aws-warning: var(--aws-warning);
+  --color-aws-danger: var(--aws-danger);
+  --color-aws-text-secondary: var(--aws-text-secondary);
+  --color-aws-text-muted: var(--aws-text-muted);
+
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* AWS Section Header Label */
+.aws-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #545b64;
+}
+
+/* AWS Panel Base */
+.aws-panel {
+  background-color: #ffffff;
+  border: 1px solid #d5d9d9;
+  border-radius: 2px;
+}
+
+.aws-panel-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid #d5d9d9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+}
+
+/* Custom scrollbars for dense table/kanban view */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f3f4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c2c7cc;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #879596;
 }

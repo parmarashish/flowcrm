@@ -1,71 +1,59 @@
-# Mini CRM
+# FlowCRM
+> Pipeline · People · Performance
 
-An open-source Mini CRM for managing leads through a sales pipeline, with
-role-based access (Admin / Team Leader / Agent), a Kanban + table view of
-leads, and a dashboard with charts and an activity feed.
+A production-grade CRM built with Next.js 15, TypeScript, Node.js, Express.js, MongoDB, and Tailwind CSS + Shadcn UI.
 
-![Next.js](https://img.shields.io/badge/Next.js-15-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
-![Express](https://img.shields.io/badge/Express-4-black)
-![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38bdf8)
-![License](https://img.shields.io/badge/license-MIT-lightgrey)
+## Features
+- Multi-role auth (Admin / Manager / Agent) with JWT + session invalidation on deactivation
+- Lead Management with Kanban board (drag & drop) and pipeline view
+- Contacts & Companies with relational linking
+- Deals & Transactions with 5-stage Kanban, notes timeline, and pipeline value tracking
+- Tasks & Follow-ups with priority/type/status and overdue detection
+- Reports & Analytics with date-range filtering, 4 charts across 3 visualization types, and CSV export
+- User & Role Management with per-module permission grid
+- Activity Log across all 6 modules with full audit trail
+
+## Security Highlights
+- Role-scoped data access (agent/manager/admin visibility rules) across all modules
+- assignedTo filter guard prevents agents querying other users data
+- Server-enforced permission locks (admin all-on, agent delete-off) regardless of API payload
+- Live session invalidation — deactivated accounts blocked immediately on next request, not just future logins
+- Self-deactivation guard prevents admin lockout
+
+## Bugs Caught & Fixed During Development
+- assignedTo filter override vulnerability (Deals) — agents could view other users deals by passing their ID
+- $lte midnight UTC boundary bug (Tasks) — due-today filter silently excluded tasks not stored at exactly midnight
+- Modulo determinism bug (Seed) — stage cycling formula made fallback dead code on every run
+- Form pre-fill bug across 4 dialogs — Radix onOpenChange not firing for externally-controlled open prop
+- Deleted record broken links (Activity Log) — fixed by treating type=deleted as non-navigable
+- Dashboard activity feed scoped to leads only — fixed to scope by user across all modules
 
 ## Tech Stack
+- Frontend: Next.js 15, TypeScript, Tailwind CSS, Shadcn UI, Redux Toolkit, RTK Query, Recharts, dnd-kit
+- Backend: Node.js, Express.js, MongoDB, Mongoose, Zod, JWT
+- DevOps: Docker, docker-compose
 
-- **Frontend:** Next.js 15, TypeScript, Tailwind CSS v4, shadcn/ui, Recharts, Redux Toolkit
-- **Backend:** Node.js, Express, MongoDB (Atlas) via Mongoose, JWT, bcrypt
-- **API docs:** Swagger
-- **Deployment:** Docker + Docker Compose
-
-## Project Structure
-
-```
-mini_crm/
-├── backend/     # Express API
-└── frontend/    # Next.js app
-```
-
-## Setup
-
-1. Clone the repo and install dependencies from the root:
-   ```bash
-   npm install
-   ```
-2. Copy the env templates and fill in real values:
-   ```bash
-   cp backend/.env.example backend/.env
-   cp frontend/.env.example frontend/.env
-   ```
-   - `backend/.env` needs a MongoDB Atlas connection string in `MONGODB_URI` and a
-     random string in `JWT_SECRET`.
-   - `frontend/.env` needs `NEXT_PUBLIC_API_URL` pointing at the backend (default
-     `http://localhost:5000/api`).
-3. Run both apps together:
-   ```bash
-   npm run dev
-   ```
-   - Backend: http://localhost:5000 (health check at `/health`)
-   - Frontend: http://localhost:3000
-
-### Seeding demo data
-
-Once the backend API is implemented (Phase 2), run:
+## Quick Start
 ```bash
-npm run seed --workspace=backend
+npm install
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
-This creates a demo Admin, Team Leader, a few Agents, and sample leads.
+Fill in `backend/.env` with a MongoDB connection string (`MONGODB_URI`) and a random `JWT_SECRET`.
+
+```bash
+npm run seed
+npm run dev
+```
+- Backend: http://localhost:5000 (health check at `/health`)
+- Frontend: http://localhost:3000
 
 ### Running with Docker
-
 ```bash
 docker compose up --build
 ```
 
-## Screenshots
-
-_Coming soon._
-
-## License
-
-MIT
+## Seed Credentials
+- Admin: admin@minicrm.com / password123
+- Manager: manager@minicrm.com / password123
+- Agent: agent@minicrm.com / password123

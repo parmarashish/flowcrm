@@ -19,9 +19,12 @@ export const authMiddleware = asyncHandler(async (req: Request, _res: Response, 
     throw new AppError("Invalid or expired token", 401, "UNAUTHORIZED");
   }
 
-  const user = await User.findById(payload.sub).select("role");
+  const user = await User.findById(payload.sub).select("role status");
   if (!user) {
     throw new AppError("Invalid or expired token", 401, "UNAUTHORIZED");
+  }
+  if (user.status === "inactive") {
+    throw new AppError("This account has been deactivated", 403, "ACCOUNT_DEACTIVATED");
   }
 
   req.user = { id: payload.sub, role: user.role };

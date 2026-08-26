@@ -5,8 +5,11 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthInitializer } from "@/components/AuthInitializer";
 
 export const metadata: Metadata = {
-  title: "Mini CRM",
-  description: "Open-source Mini CRM for lead management",
+  title: "FlowCRM — Pipeline · People · Performance",
+  description: "Production-grade CRM for modern sales teams",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
