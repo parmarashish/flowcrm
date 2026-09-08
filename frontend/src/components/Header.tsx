@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Search, Bell, ChevronDown, User as UserIcon, Shield, LogOut, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -31,7 +32,7 @@ export function Header() {
 
   // Generate page title and breadcrumbs based on pathname
   let pageTitle = "Dashboard";
-  let breadcrumbs = ["Dashboard"];
+  let breadcrumbs = ["Overview", "Dashboard"];
 
   if (pathname === "/dashboard") {
     pageTitle = "Dashboard";
@@ -48,10 +49,41 @@ export function Header() {
   } else if (pathname.startsWith("/leads/")) {
     pageTitle = "Lead Details";
     breadcrumbs = ["Management", "Leads", "Edit Lead"];
+  } else if (pathname === "/contacts") {
+    pageTitle = "Contacts";
+    breadcrumbs = ["Management", "Contacts"];
+  } else if (pathname.startsWith("/contacts/")) {
+    pageTitle = "Contact Details";
+    breadcrumbs = ["Management", "Contacts", "Details"];
+  } else if (pathname === "/companies") {
+    pageTitle = "Companies";
+    breadcrumbs = ["Management", "Companies"];
+  } else if (pathname.startsWith("/companies/")) {
+    pageTitle = "Company Details";
+    breadcrumbs = ["Management", "Companies", "Details"];
+  } else if (pathname === "/deals") {
+    pageTitle = "Deals";
+    breadcrumbs = ["Pipeline", "Deals"];
+  } else if (pathname.startsWith("/deals/")) {
+    pageTitle = "Deal Details";
+    breadcrumbs = ["Pipeline", "Deals", "Details"];
+  } else if (pathname === "/tasks") {
+    pageTitle = "Tasks";
+    breadcrumbs = ["Activities", "Tasks"];
+  } else if (pathname === "/activity") {
+    pageTitle = "Activity Log";
+    breadcrumbs = ["Activities", "Activity Log"];
+  } else if (pathname === "/reports") {
+    pageTitle = "Reports & Analytics";
+    breadcrumbs = ["Insights", "Reports"];
   } else if (pathname === "/users") {
     pageTitle = "User Management";
     breadcrumbs = ["Administration", "Users & Roles"];
   }
+
+  useEffect(() => {
+    document.title = `${pageTitle} · FlowCRM`;
+  }, [pageTitle]);
 
   const getInitials = (name?: string) => {
     if (!name) return "U";

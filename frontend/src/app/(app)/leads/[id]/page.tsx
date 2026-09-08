@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { LeadForm, type LeadFormValues } from "@/components/LeadForm";
 import { StatusBadge } from "@/components/StatusBadge";
 import {
@@ -36,6 +37,7 @@ export default function LeadDetailPage() {
   const [reassignLead, { isLoading: isReassigning }] = useReassignLeadMutation();
   const [deleteLead, { isLoading: isDeleting }] = useDeleteLeadMutation();
   const [reassignTo, setReassignTo] = useState("");
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   const canReassign = currentUser?.role === "admin" || currentUser?.role === "team_leader";
   const canDelete = currentUser?.role === "admin";
@@ -61,14 +63,14 @@ export default function LeadDetailPage() {
   }
 
   async function handleDelete() {
-    if (!confirm("Are you sure you want to delete this lead? This action is irreversible."))
-      return;
     try {
       await deleteLead(id).unwrap();
       toast.success("Lead deleted");
       router.push("/leads");
     } catch {
       toast.error("Failed to delete lead");
+    } finally {
+      setConfirmDeleteOpen(false);
     }
   }
 
@@ -133,7 +135,7 @@ export default function LeadDetailPage() {
           <Button
             variant="destructive"
             size="sm"
-            onClick={handleDelete}
+            onClick={() => setConfirmDeleteOpen(true)}
             disabled={isDeleting}
             className="gap-1.5"
           >
@@ -229,6 +231,14 @@ export default function LeadDetailPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title="Delete Lead"
+        description="Are you sure you want to delete this lead? This action is irreversible."
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

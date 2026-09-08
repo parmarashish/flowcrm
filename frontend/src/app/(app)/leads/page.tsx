@@ -18,6 +18,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -58,6 +59,7 @@ export default function LeadsPage() {
   const [limit, setLimit] = useState(20);
   const [showFilters, setShowFilters] = useState(true);
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const currentUser = useAppSelector(selectCurrentUser);
   const router = useRouter();
@@ -108,14 +110,21 @@ export default function LeadsPage() {
     );
   }
 
-  async function handleDelete(id: string, name: string) {
-    if (!confirm(`Delete lead "${name}"? This action cannot be undone.`)) return;
+  function handleDelete(id: string, name: string) {
+    setDeleteTarget({ id, name });
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    const { id } = deleteTarget;
     try {
       await deleteLead(id).unwrap();
       toast.success("Lead deleted successfully");
       setSelectedLeads((prev) => prev.filter((i) => i !== id));
     } catch {
       toast.error("Failed to delete lead");
+    } finally {
+      setDeleteTarget(null);
     }
   }
 
@@ -498,6 +507,14 @@ export default function LeadsPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Delete Lead"
+        description={`Delete lead "${deleteTarget?.name}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

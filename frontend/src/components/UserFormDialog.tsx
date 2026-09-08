@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -12,6 +11,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,7 +57,6 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
   const [email, setEmail] = useState(user?.email ?? "");
   const [role, setRole] = useState<UserRole>(user?.role ?? "agent");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
@@ -76,7 +75,6 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
       setEmail(user?.email ?? "");
       setRole(user?.role ?? "agent");
       setPassword("");
-      setShowPassword(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, user?.id]);
@@ -172,26 +170,15 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
                 <Label htmlFor="user-password" className="text-xs font-semibold text-[#545b64]">
                   Temporary Password <span className="text-[#d13212]">*</span>
                 </Label>
-                <div className="relative">
-                  <Input
-                    id="user-password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    minLength={8}
-                    placeholder="At least 8 characters"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="h-8 text-xs pr-8"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[#879596] hover:text-[#0f1923] cursor-pointer"
-                    title={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
-                  </button>
-                </div>
+                <PasswordInput
+                  id="user-password"
+                  required
+                  minLength={8}
+                  placeholder="At least 8 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-8 text-xs"
+                />
               </div>
             )}
           </div>

@@ -29,6 +29,7 @@ import {
 import { StatusBadge } from "@/components/StatusBadge";
 import { DealStageBadge } from "@/components/DealStageBadge";
 import { DealFormDialog } from "@/components/DealFormDialog";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import {
   useGetDealQuery,
   useUpdateDealMutation,
@@ -91,6 +92,7 @@ export default function DealDetailPage() {
   const [addNote, { isLoading: isAddingNote }] = useAddDealNoteMutation();
   const [deleteDeal, { isLoading: isDeleting }] = useDeleteDealMutation();
   const [editOpen, setEditOpen] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
 
   const canDelete = currentUser?.role === "admin";
@@ -118,13 +120,14 @@ export default function DealDetailPage() {
   }
 
   async function handleDelete() {
-    if (!confirm("Are you sure you want to delete this deal? This action is irreversible.")) return;
     try {
       await deleteDeal(id).unwrap();
       toast.success("Deal deleted");
       router.push("/deals");
     } catch {
       toast.error("Failed to delete deal");
+    } finally {
+      setConfirmDeleteOpen(false);
     }
   }
 
@@ -198,7 +201,7 @@ export default function DealDetailPage() {
             <Button
               variant="destructive"
               size="sm"
-              onClick={handleDelete}
+              onClick={() => setConfirmDeleteOpen(true)}
               disabled={isDeleting}
               className="gap-1.5"
             >
@@ -359,6 +362,14 @@ export default function DealDetailPage() {
       </div>
 
       <DealFormDialog open={editOpen} onOpenChange={setEditOpen} deal={deal} />
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title="Delete Deal"
+        description="Are you sure you want to delete this deal? This action is irreversible."
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

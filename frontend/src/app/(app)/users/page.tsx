@@ -18,6 +18,7 @@ import { RoleBadge } from "@/components/RoleBadge";
 import { UserStatusBadge } from "@/components/UserStatusBadge";
 import { UserFormDialog } from "@/components/UserFormDialog";
 import { UserDetailDrawer } from "@/components/UserDetailDrawer";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import {
   useGetUsersQuery,
   useUpdateUserStatusMutation,
@@ -38,6 +39,7 @@ export default function UsersPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | undefined>(undefined);
   const [drawerUserId, setDrawerUserId] = useState<string | null>(null);
+  const [deactivateTarget, setDeactivateTarget] = useState<AdminUser | null>(null);
 
   useEffect(() => {
     if (currentUser && currentUser.role !== "admin") {
@@ -66,15 +68,27 @@ export default function UsersPage() {
   }
 
   async function handleToggleStatus(user: AdminUser) {
-    const nextStatus = user.status === "active" ? "inactive" : "active";
-    if (nextStatus === "inactive" && !confirm(`Deactivate "${user.name}"? They will be signed out immediately and unable to log back in until reactivated.`)) {
+    if (user.status === "active") {
+      setDeactivateTarget(user);
       return;
     }
     try {
-      await updateUserStatus({ id: user.id, status: nextStatus }).unwrap();
-      toast.success(nextStatus === "active" ? "User activated" : "User deactivated");
+      await updateUserStatus({ id: user.id, status: "active" }).unwrap();
+      toast.success("User activated");
     } catch {
       toast.error("Failed to update user status");
+    }
+  }
+
+  async function confirmDeactivate() {
+    if (!deactivateTarget) return;
+    try {
+      await updateUserStatus({ id: deactivateTarget.id, status: "inactive" }).unwrap();
+      toast.success("User deactivated");
+    } catch {
+      toast.error("Failed to update user status");
+    } finally {
+      setDeactivateTarget(null);
     }
   }
 
@@ -233,6 +247,16 @@ export default function UsersPage() {
         onOpenChange={(open) => {
           if (!open) setDrawerUserId(null);
         }}
+      />
+
+      <ConfirmDialog
+        open={Boolean(deactivateTarget)}
+        onOpenChange={(open) => !open && setDeactivateTarget(null)}
+        title="Deactivate User"
+        description={`Deactivate "${deactivateTarget?.name}"? They will be signed out immediately and unable to log back in until reactivated.`}
+        confirmLabel="Deactivate"
+        variant="destructive"
+        onConfirm={confirmDeactivate}
       />
     </div>
   );

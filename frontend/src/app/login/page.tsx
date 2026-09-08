@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
 import { useLoginMutation } from "@/features/auth/authApi";
@@ -80,9 +81,8 @@ export default function LoginPage() {
                     Password <span className="text-[#d13212]">*</span>
                   </Label>
                 </div>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   required
                   placeholder="••••••••"
                   value={password}

@@ -47,6 +47,7 @@ import {
 } from "@/features/deals/dealsApi";
 import { DealKanbanColumn } from "@/components/deals-kanban/DealKanbanColumn";
 import { DealFormDialog } from "@/components/DealFormDialog";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { DealStageBadge } from "@/components/DealStageBadge";
 import { useAppSelector } from "@/store/hooks";
 import { selectCurrentUser } from "@/features/auth/authSlice";
@@ -115,6 +116,7 @@ export default function DealsPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingDeal, setEditingDeal] = useState<Deal | undefined>(undefined);
   const [defaultStage, setDefaultStage] = useState<DealStage>("Negotiation");
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const currentUser = useAppSelector(selectCurrentUser);
   const router = useRouter();
@@ -205,13 +207,19 @@ export default function DealsPage() {
     }
   }
 
-  async function handleDelete(id: string, title: string) {
-    if (!confirm(`Delete deal "${title}"? This action cannot be undone.`)) return;
+  function handleDelete(id: string, title: string) {
+    setDeleteTarget({ id, title });
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
     try {
-      await deleteDeal(id).unwrap();
+      await deleteDeal(deleteTarget.id).unwrap();
       toast.success("Deal deleted successfully");
     } catch {
       toast.error("Failed to delete deal");
+    } finally {
+      setDeleteTarget(null);
     }
   }
 
@@ -617,6 +625,14 @@ export default function DealsPage() {
         onOpenChange={setFormOpen}
         deal={editingDeal}
         defaultStage={defaultStage}
+      />
+
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Delete Deal"
+        description={`Delete deal "${deleteTarget?.title}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
       />
     </div>
   );

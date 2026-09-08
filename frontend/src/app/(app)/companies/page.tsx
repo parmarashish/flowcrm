@@ -16,6 +16,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,6 +45,7 @@ export default function CompaniesPage() {
   const [limit, setLimit] = useState(20);
   const [formOpen, setFormOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | undefined>(undefined);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const currentUser = useAppSelector(selectCurrentUser);
   const router = useRouter();
@@ -71,18 +73,19 @@ export default function CompaniesPage() {
     setFormOpen(true);
   }
 
-  async function handleDelete(id: string, name: string) {
-    if (
-      !confirm(
-        `Delete company "${name}"? Its contacts will be kept but unlinked from this company. This action cannot be undone.`
-      )
-    )
-      return;
+  function handleDelete(id: string, name: string) {
+    setDeleteTarget({ id, name });
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
     try {
-      await deleteCompany(id).unwrap();
+      await deleteCompany(deleteTarget.id).unwrap();
       toast.success("Company deleted successfully");
     } catch {
       toast.error("Failed to delete company");
+    } finally {
+      setDeleteTarget(null);
     }
   }
 
@@ -328,6 +331,14 @@ export default function CompaniesPage() {
       </div>
 
       <CompanyFormDialog open={formOpen} onOpenChange={setFormOpen} company={editingCompany} />
+
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Delete Company"
+        description={`Delete company "${deleteTarget?.name}"? Its contacts will be kept but unlinked from this company. This action cannot be undone.`}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

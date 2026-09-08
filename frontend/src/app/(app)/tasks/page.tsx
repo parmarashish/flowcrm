@@ -16,6 +16,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -92,6 +93,7 @@ function TasksPageContent() {
   const [limit, setLimit] = useState(20);
   const [formOpen, setFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const currentUser = useAppSelector(selectCurrentUser);
 
@@ -135,13 +137,19 @@ function TasksPageContent() {
     setPage(1);
   }
 
-  async function handleDelete(id: string, title: string) {
-    if (!confirm(`Delete task "${title}"? This action cannot be undone.`)) return;
+  function handleDelete(id: string, title: string) {
+    setDeleteTarget({ id, title });
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
     try {
-      await deleteTask(id).unwrap();
+      await deleteTask(deleteTarget.id).unwrap();
       toast.success("Task deleted successfully");
     } catch {
       toast.error("Failed to delete task");
+    } finally {
+      setDeleteTarget(null);
     }
   }
 
@@ -421,6 +429,14 @@ function TasksPageContent() {
       </div>
 
       <TaskFormDialog open={formOpen} onOpenChange={setFormOpen} task={editingTask} />
+
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Delete Task"
+        description={`Delete task "${deleteTarget?.title}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

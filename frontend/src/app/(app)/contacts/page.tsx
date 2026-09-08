@@ -16,6 +16,7 @@ import {
   Building2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,6 +45,7 @@ export default function ContactsPage() {
   const [limit, setLimit] = useState(20);
   const [formOpen, setFormOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | undefined>(undefined);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const currentUser = useAppSelector(selectCurrentUser);
   const router = useRouter();
@@ -71,13 +73,19 @@ export default function ContactsPage() {
     setFormOpen(true);
   }
 
-  async function handleDelete(id: string, name: string) {
-    if (!confirm(`Delete contact "${name}"? This action cannot be undone.`)) return;
+  function handleDelete(id: string, name: string) {
+    setDeleteTarget({ id, name });
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
     try {
-      await deleteContact(id).unwrap();
+      await deleteContact(deleteTarget.id).unwrap();
       toast.success("Contact deleted successfully");
     } catch {
       toast.error("Failed to delete contact");
+    } finally {
+      setDeleteTarget(null);
     }
   }
 
@@ -322,6 +330,14 @@ export default function ContactsPage() {
       </div>
 
       <ContactFormDialog open={formOpen} onOpenChange={setFormOpen} contact={editingContact} />
+
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Delete Contact"
+        description={`Delete contact "${deleteTarget?.name}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }
