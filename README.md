@@ -1,5 +1,20 @@
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-flowcrm1.vercel.app-0066cc?style=for-the-badge)](https://flowcrm1.vercel.app)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)]()
+[![Next.js](https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=next.js&logoColor=white)]()
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)]()
+[![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)]()
+
 # FlowCRM
 > Pipeline · People · Performance
+
+## 🚀 Live Demo
+**URL:** https://flowcrm1.vercel.app
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@flowcrm.com | password123 |
+| Manager | manager@flowcrm.com | password123 |
+| Agent | agent@flowcrm.com | password123 |
 
 A production-grade CRM built with Next.js 15, TypeScript, Node.js, Express.js, MongoDB, and Tailwind CSS + Shadcn UI.
 
