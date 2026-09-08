@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -42,6 +42,14 @@ export function Sidebar() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 767px)");
+    setCollapsed(mql.matches);
+    const handleChange = (e: MediaQueryListEvent) => setCollapsed(e.matches);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
+  }, []);
 
   function handleLogout() {
     dispatch(logout());

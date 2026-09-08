@@ -99,6 +99,8 @@ export const createLead = asyncHandler(async (req: Request, res: Response) => {
     assignedTo: lead.assignedTo.toString(),
     type: "created",
     message: `${lead.name} created`,
+    recordId: lead.id as string,
+    recordTitle: lead.name,
   });
   res.status(201).json({ lead: toPublicLead(lead) });
 });
@@ -144,6 +146,8 @@ export const updateLead = asyncHandler(async (req: Request, res: Response) => {
       type: "status_changed",
       message: `moved to ${body.status}`,
       meta: { from: previousStatus, to: body.status },
+      recordId: lead.id as string,
+      recordTitle: lead.name,
     });
   } else {
     await logActivity({
@@ -152,6 +156,8 @@ export const updateLead = asyncHandler(async (req: Request, res: Response) => {
       assignedTo: lead.assignedTo.toString(),
       type: "updated",
       message: `${lead.name} updated`,
+      recordId: lead.id as string,
+      recordTitle: lead.name,
     });
   }
 
@@ -180,6 +186,8 @@ export const reassignLead = asyncHandler(async (req: Request, res: Response) => 
     type: "assigned",
     message: `reassigned`,
     meta: { assignedTo: body.assignedTo },
+    recordId: lead.id as string,
+    recordTitle: lead.name,
   });
   res.json({ lead: toPublicLead(lead) });
 });
@@ -195,6 +203,8 @@ export const deleteLead = asyncHandler(async (req: Request, res: Response) => {
     assignedTo: lead.assignedTo.toString(),
     type: "deleted",
     message: `${lead.name} deleted`,
+    recordId: lead.id as string,
+    recordTitle: lead.name,
   });
   await lead.deleteOne();
   res.status(204).send();

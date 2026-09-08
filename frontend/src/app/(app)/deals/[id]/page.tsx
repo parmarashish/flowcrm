@@ -367,7 +367,7 @@ export default function DealDetailPage() {
         open={confirmDeleteOpen}
         onOpenChange={setConfirmDeleteOpen}
         title="Delete Deal"
-        description="Are you sure you want to delete this deal? This action is irreversible."
+        description={`Delete deal "${deal.title}"? This action is irreversible.`}
         onConfirm={handleDelete}
       />
     </div>

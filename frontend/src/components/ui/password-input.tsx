@@ -15,7 +15,6 @@ function PasswordInput({ className, ...props }: React.ComponentProps<"input">) {
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
-        tabIndex={-1}
         className="absolute right-2 top-1/2 -translate-y-1/2 text-[#879596] hover:text-[#0f1923] cursor-pointer"
         title={visible ? "Hide password" : "Show password"}
       >

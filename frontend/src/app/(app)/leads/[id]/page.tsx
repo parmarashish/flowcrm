@@ -236,7 +236,7 @@ export default function LeadDetailPage() {
         open={confirmDeleteOpen}
         onOpenChange={setConfirmDeleteOpen}
         title="Delete Lead"
-        description="Are you sure you want to delete this lead? This action is irreversible."
+        description={`Delete lead "${lead.name}"? This action is irreversible.`}
         onConfirm={handleDelete}
       />
     </div>
