@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, ChevronDown, User as UserIcon, Shield, LogOut, CheckCircle2 } from "lucide-react";
+import { ChevronDown, User as UserIcon, Shield, LogOut, CheckCircle2 } from "lucide-react";
 import { HeaderSearch } from "@/components/HeaderSearch";
 import {
   DropdownMenu,
@@ -118,15 +118,6 @@ export function Header() {
       <div className="flex items-center gap-3">
         {/* Global Search */}
         <HeaderSearch />
-
-        {/* Notification Bell */}
-        <button
-          className="relative flex h-8 w-8 items-center justify-center rounded-[2px] border border-transparent text-[#545b64] hover:bg-[#f2f3f3] hover:text-[#0f1923] transition-colors"
-          title="Notifications"
-        >
-          <Bell className="size-4" />
-          <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-[#0066cc]" />
-        </button>
 
         {/* Region / Status Indicator Pill */}
         <div className="hidden md:flex items-center gap-1.5 rounded-[2px] border border-[#d5d9d9] bg-[#f8f9fa] px-2 py-1 text-[11px] text-[#545b64]">

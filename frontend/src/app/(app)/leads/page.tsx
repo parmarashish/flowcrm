@@ -58,7 +58,6 @@ export default function LeadsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [showFilters, setShowFilters] = useState(true);
-  const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [nameSortDir, setNameSortDir] = useState<"asc" | "desc" | null>(null);
 
@@ -108,21 +107,6 @@ export default function LeadsPage() {
     setPage(1);
   }
 
-  function handleSelectAll() {
-    if (!data?.items) return;
-    if (selectedLeads.length === data.items.length) {
-      setSelectedLeads([]);
-    } else {
-      setSelectedLeads(data.items.map((lead) => lead.id));
-    }
-  }
-
-  function toggleSelectLead(id: string) {
-    setSelectedLeads((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  }
-
   function handleDelete(id: string, name: string) {
     setDeleteTarget({ id, name });
   }
@@ -133,7 +117,6 @@ export default function LeadsPage() {
     try {
       await deleteLead(id).unwrap();
       toast.success("Lead deleted successfully");
-      setSelectedLeads((prev) => prev.filter((i) => i !== id));
     } catch {
       toast.error("Failed to delete lead");
     } finally {
@@ -328,17 +311,6 @@ export default function LeadsPage() {
           <table className="w-full text-left text-[13px] border-collapse">
             <thead className="bg-[#f1f3f4] border-b border-[#d5d9d9] select-none">
               <tr>
-                <th className="w-8 px-3 py-2 text-center">
-                  <input
-                    type="checkbox"
-                    className="rounded-[2px] border-[#aab7b8] text-[#0066cc] focus:ring-[#0066cc] cursor-pointer"
-                    checked={
-                      (data?.items.length ?? 0) > 0 &&
-                      selectedLeads.length === (data?.items.length ?? 0)
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </th>
                 <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-[#545b64]">
                   <button
                     onClick={handleNameSort}
@@ -369,23 +341,8 @@ export default function LeadsPage() {
             </thead>
             <tbody className="divide-y divide-[#d5d9d9]">
               {sortedItems.map((lead) => {
-                const isSelected = selectedLeads.includes(lead.id);
-
                 return (
-                  <tr
-                    key={lead.id}
-                    className={`h-10 transition-colors ${
-                      isSelected ? "bg-[#eaf3fc]" : "hover:bg-[#f8f9fa]"
-                    }`}
-                  >
-                    <td className="w-8 px-3 py-2 text-center">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleSelectLead(lead.id)}
-                        className="rounded-[2px] border-[#aab7b8] text-[#0066cc] focus:ring-[#0066cc] cursor-pointer"
-                      />
-                    </td>
+                  <tr key={lead.id} className="h-10 transition-colors hover:bg-[#f8f9fa]">
                     <td className="px-3 py-2 font-medium">
                       <Link
                         href={`/leads/${lead.id}`}
