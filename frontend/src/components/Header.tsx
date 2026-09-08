@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Bell, ChevronDown, User as UserIcon, Shield, LogOut, CheckCircle2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Bell, ChevronDown, User as UserIcon, Shield, LogOut, CheckCircle2 } from "lucide-react";
+import { HeaderSearch } from "@/components/HeaderSearch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -116,14 +116,8 @@ export function Header() {
 
       {/* Right Controls */}
       <div className="flex items-center gap-3">
-        {/* Compact Search Bar */}
-        <div className="relative w-[240px] sm:w-[280px]">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-[#545b64]" />
-          <Input
-            placeholder="Search leads, contacts, status..."
-            className="h-8 pl-8 pr-2.5 text-xs border-[#aab7b8] placeholder:text-[#879596]"
-          />
-        </div>
+        {/* Global Search */}
+        <HeaderSearch />
 
         {/* Notification Bell */}
         <button

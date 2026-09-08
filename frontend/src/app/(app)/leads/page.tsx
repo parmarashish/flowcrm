@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -60,6 +60,7 @@ export default function LeadsPage() {
   const [showFilters, setShowFilters] = useState(true);
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [nameSortDir, setNameSortDir] = useState<"asc" | "desc" | null>(null);
 
   const currentUser = useAppSelector(selectCurrentUser);
   const router = useRouter();
@@ -86,6 +87,18 @@ export default function LeadsPage() {
     (source !== "all" ? 1 : 0) +
     (dateFrom ? 1 : 0) +
     (dateTo ? 1 : 0);
+
+  function handleNameSort() {
+    setNameSortDir((d) => (d === "asc" ? "desc" : "asc"));
+  }
+
+  const sortedItems = useMemo(() => {
+    const items = data?.items ?? [];
+    if (!nameSortDir) return items;
+    return [...items].sort((a, b) =>
+      nameSortDir === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+    );
+  }, [data?.items, nameSortDir]);
 
   function resetFilters() {
     setStatus("all");
@@ -327,9 +340,12 @@ export default function LeadsPage() {
                   />
                 </th>
                 <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-[#545b64]">
-                  <div className="flex items-center gap-1 cursor-pointer hover:text-[#0f1923]">
-                    Name <ArrowUpDown className="size-3 text-[#879596]" />
-                  </div>
+                  <button
+                    onClick={handleNameSort}
+                    className="flex items-center gap-1 cursor-pointer hover:text-[#0f1923]"
+                  >
+                    Name <ArrowUpDown className={`size-3 ${nameSortDir ? "text-[#0066cc]" : "text-[#879596]"}`} />
+                  </button>
                 </th>
                 <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-[#545b64]">
                   Email
@@ -352,7 +368,7 @@ export default function LeadsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#d5d9d9]">
-              {data?.items.map((lead) => {
+              {sortedItems.map((lead) => {
                 const isSelected = selectedLeads.includes(lead.id);
 
                 return (
