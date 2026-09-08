@@ -145,7 +145,7 @@ async function main() {
   console.log("[seed] creating users...");
   const admin = await User.create({
     name: "Admin User",
-    email: "admin@minicrm.com",
+    email: "admin@flowcrm.com",
     passwordHash,
     role: "admin",
     permissions: permissionsForRole("admin"),
@@ -153,7 +153,7 @@ async function main() {
   });
   const manager = await User.create({
     name: "Manager User",
-    email: "manager@minicrm.com",
+    email: "manager@flowcrm.com",
     passwordHash,
     role: "team_leader",
     permissions: permissionsForRole("team_leader"),
@@ -161,7 +161,7 @@ async function main() {
   });
   const agent = await User.create({
     name: "Agent User",
-    email: "agent@minicrm.com",
+    email: "agent@flowcrm.com",
     passwordHash,
     role: "agent",
     teamLead: manager._id,
@@ -577,9 +577,9 @@ async function main() {
 
   console.log("[seed] done.");
   console.log(`[seed] created ${companies.length} companies, ${contacts.length} contacts, ${createdLeads.length} leads, ${activityDocs.length} activity entries, ${dealCount} deals, ${totalDealNotes} deal notes, ${taskCount} tasks`);
-  console.log(`[seed] admin login: admin@minicrm.com / password123`);
-  console.log(`[seed] manager login: manager@minicrm.com / password123`);
-  console.log(`[seed] agent login: agent@minicrm.com / password123`);
+  console.log(`[seed] admin login: admin@flowcrm.com / password123`);
+  console.log(`[seed] manager login: manager@flowcrm.com / password123`);
+  console.log(`[seed] agent login: agent@flowcrm.com / password123`);
 
   await mongoose.disconnect();
   process.exit(0);

@@ -56,7 +56,7 @@ export function selectHasHydrated(state: { auth: AuthState }): boolean {
   return state.auth.hasHydrated;
 }
 
-const AUTH_STORAGE_KEY = "mini_crm_auth";
+const AUTH_STORAGE_KEY = "flowcrm_auth";
 
 export function persistAuth(token: string, user: PublicUser): void {
   localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ token, user }));

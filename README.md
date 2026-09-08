@@ -54,6 +54,6 @@ docker compose up --build
 ```
 
 ## Seed Credentials
-- Admin: admin@minicrm.com / password123
-- Manager: manager@minicrm.com / password123
-- Agent: agent@minicrm.com / password123
+- Admin: admin@flowcrm.com / password123
+- Manager: manager@flowcrm.com / password123
+- Agent: agent@flowcrm.com / password123
